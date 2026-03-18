@@ -48,17 +48,8 @@ use Symfony\Component\HttpFoundation\HeaderUtils;
  */
 class PDF
 {
-    /** @var Dompdf  */
-    protected $dompdf;
-
-    /** @var \Illuminate\Contracts\Config\Repository  */
-    protected $config;
-
     /** @var \Illuminate\Filesystem\Filesystem  */
     protected $files;
-
-    /** @var \Illuminate\Contracts\View\Factory  */
-    protected $view;
 
     /** @var bool */
     protected $rendered = false;
@@ -69,12 +60,9 @@ class PDF
     /** @var string */
     protected $public_path;
 
-    public function __construct(Dompdf $dompdf, ConfigRepository $config, Filesystem $files, ViewFactory $view)
+    public function __construct(protected \Dompdf\Dompdf $dompdf, protected \Illuminate\Contracts\Config\Repository $config, Filesystem $files, protected \Illuminate\Contracts\View\Factory $view)
     {
-        $this->dompdf = $dompdf;
-        $this->config = $config;
         $this->files = $files;
-        $this->view = $view;
 
         $this->showWarnings = $this->config->get('dompdf.show_warnings', false);
     }
@@ -290,11 +278,10 @@ class PDF
     /**
      * Dynamically handle calls into the dompdf instance.
      *
-     * @param string $method
      * @param array<mixed> $parameters
      * @return $this|mixed
      */
-    public function __call($method, $parameters)
+    public function __call(string $method, array $parameters)
     {
         if (method_exists($this, $method)) {
             return $this->$method(...$parameters);

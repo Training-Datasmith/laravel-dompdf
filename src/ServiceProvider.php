@@ -20,14 +20,13 @@ class ServiceProvider extends IlluminateServiceProvider
      * Register the service provider.
      *
      * @throws \Exception
-     * @return void
      */
     public function register(): void
     {
         $configPath = __DIR__ . '/../config/dompdf.php';
         $this->mergeConfigFrom($configPath, 'dompdf');
 
-        $this->app->bind('dompdf.options', function ($app) {
+        $this->app->bind('dompdf.options', function (array $app) {
             $defines = $app['config']->get('dompdf.defines');
 
             if ($defines) {
@@ -47,7 +46,7 @@ class ServiceProvider extends IlluminateServiceProvider
             return $options;
         });
 
-        $this->app->bind('dompdf', function ($app) {
+        $this->app->bind('dompdf', function (array $app): \Dompdf\Dompdf {
 
             $options = $app->make('dompdf.options');
             $dompdf = new Dompdf($options);
@@ -61,9 +60,7 @@ class ServiceProvider extends IlluminateServiceProvider
         });
         $this->app->alias('dompdf', Dompdf::class);
 
-        $this->app->bind('dompdf.wrapper', function ($app) {
-            return new PDF($app['dompdf'], $app['config'], $app['files'], $app['view']);
-        });
+        $this->app->bind('dompdf.wrapper', fn($app) => new PDF($app['dompdf'], $app['config'], $app['files'], $app['view']));
     }
 
     /**
