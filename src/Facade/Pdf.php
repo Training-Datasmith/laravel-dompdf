@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Barryvdh\DomPDF\Facade;
 
 use Barryvdh\DomPDF\PDF as BasePDF;

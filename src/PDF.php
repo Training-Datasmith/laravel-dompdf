@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Barryvdh\DomPDF;
 
 use Dompdf\Adapter\CPDF;
@@ -7,8 +9,6 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use Exception;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Contracts\View\Factory as ViewFactory;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -216,7 +216,6 @@ class PDF
     {
         $output = $this->output();
         $fallback = $this->fallbackName($filename);
-
 
         return new Response($output, 200, [
             'Content-Type' => 'application/pdf',

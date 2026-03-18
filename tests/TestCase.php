@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Barryvdh\DomPDF\Tests;
 
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -8,7 +10,7 @@ use Illuminate\Support\Facades\View;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
-    protected function setUp() : void
+    protected function setUp(): void
     {
         parent::setUp();
 

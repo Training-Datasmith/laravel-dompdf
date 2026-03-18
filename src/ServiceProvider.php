@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Barryvdh\DomPDF;
 
 use Dompdf\Dompdf;
-use Exception;
-use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;
+use Illuminate\Support\Str;
 
 class ServiceProvider extends IlluminateServiceProvider
 {
@@ -60,7 +61,7 @@ class ServiceProvider extends IlluminateServiceProvider
         });
         $this->app->alias('dompdf', Dompdf::class);
 
-        $this->app->bind('dompdf.wrapper', fn($app) => new PDF($app['dompdf'], $app['config'], $app['files'], $app['view']));
+        $this->app->bind('dompdf.wrapper', fn ($app) => new PDF($app['dompdf'], $app['config'], $app['files'], $app['view']));
     }
 
     /**
