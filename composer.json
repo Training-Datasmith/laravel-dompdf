@@ -26,12 +26,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Barryvdh\\DomPDF\\": "src"
+            "Barryvdh\\Dom_PDF\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Barryvdh\\DomPDF\\Tests\\": "tests"
+            "Barryvdh\\Dom_PDF\\Tests\\": "tests"
         }
     },
     "extra": {
