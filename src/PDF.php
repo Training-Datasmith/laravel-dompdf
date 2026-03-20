@@ -1,8 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Barryvdh\DomPDF;
+declare (strict_types=1);
+namespace Barryvdh\Dom_Pdf;
 
 use Dompdf\Adapter\CPDF;
 use Dompdf\Dompdf;
@@ -12,8 +11,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\HeaderUtils;
-
+use Symfony\Component\Http_Foundation\Header_Utils;
 /**
  * A Laravel wrapper for Dompdf
  *
@@ -50,114 +48,99 @@ class PDF
 {
     /** @var \Illuminate\Filesystem\Filesystem  */
     protected $files;
-
     /** @var bool */
     protected $rendered = false;
-
     /** @var bool */
-    protected $showWarnings;
-
+    protected $show_warnings;
     /** @var string */
     protected $public_path;
-
     public function __construct(protected \Dompdf\Dompdf $dompdf, protected \Illuminate\Contracts\Config\Repository $config, Filesystem $files, protected \Illuminate\Contracts\View\Factory $view)
     {
         $this->files = $files;
-
-        $this->showWarnings = $this->config->get('dompdf.show_warnings', false);
+        $this->show_warnings = $this->config->get('dompdf.show_warnings', false);
     }
-
     /**
      * Get the DomPDF instance
      */
-    public function getDomPDF(): Dompdf
+    public function get_dom_pdf(): Dompdf
     {
         return $this->dompdf;
     }
-
     /**
      * Show or hide warnings
      */
-    public function setWarnings(bool $warnings): self
+    public function set_warnings(bool $warnings): self
     {
-        $this->showWarnings = $warnings;
+        $this->show_warnings = $warnings;
         return $this;
     }
-
     /**
      * Load a HTML string
      *
      * @param string|null $encoding Not used yet
      */
-    public function loadHTML(string $string, ?string $encoding = null): self
+    public function load_html(string $string, ?string $encoding = null): self
     {
-        $string = $this->convertEntities($string);
-        $this->dompdf->loadHtml($string, $encoding);
+        $string = $this->convert_entities($string);
+        $this->dompdf->load_html($string, $encoding);
         $this->rendered = false;
         return $this;
     }
-
     /**
      * Load a HTML file
      */
-    public function loadFile(string $file): self
+    public function load_file(string $file): self
     {
-        $this->dompdf->loadHtmlFile($file);
+        $this->dompdf->load_html_file($file);
         $this->rendered = false;
         return $this;
     }
-
     /**
      * Add metadata info
      * @param array<string, string> $info
      */
-    public function addInfo(array $info): self
+    public function add_info(array $info): self
     {
         foreach ($info as $name => $value) {
             $this->dompdf->add_info($name, $value);
         }
         return $this;
     }
-
     /**
      * Load a View and convert to HTML
      * @param array<string, mixed> $data
      * @param array<string, mixed> $mergeData
      * @param string|null $encoding Not used yet
      */
-    public function loadView(string $view, array $data = [], array $mergeData = [], ?string $encoding = null): self
+    public function load_view(string $view, array $data = [], array $merge_data = [], ?string $encoding = null): self
     {
-        $html = $this->view->make($view, $data, $mergeData)->render();
-        return $this->loadHTML($html, $encoding);
+        $html = $this->view->make($view, $data, $merge_data)->render();
+        return $this->load_html($html, $encoding);
     }
-
     /**
      * Set/Change an option (or array of options) in Dompdf
      *
      * @param array<string, mixed>|string $attribute
      * @param null|mixed $value
      */
-    public function setOption($attribute, $value = null): self
+    public function set_option($attribute, $value = null): self
     {
-        $this->dompdf->getOptions()->set($attribute, $value);
+        $this->dompdf->get_options()->set($attribute, $value);
         return $this;
     }
-
     /**
      * Replace all the Options from DomPDF
      *
      * @param array<string, mixed> $options
      */
-    public function setOptions(array $options, bool $mergeWithDefaults = false): self
+    public function set_options(array $options, bool $merge_with_defaults = false): self
     {
-        if ($mergeWithDefaults) {
+        if ($merge_with_defaults) {
             $options = array_merge(app()->make('dompdf.options'), $options);
         }
-
-        $this->dompdf->setOptions(new Options($options));
+        $this->dompdf->set_options(new Options($options));
         return $this;
     }
-
     /**
      * Output the PDF as a string.
      *
@@ -177,60 +160,44 @@ class PDF
         }
         return (string) $this->dompdf->output($options);
     }
-
     /**
      * Save the PDF to a file
      */
     public function save(string $filename, ?string $disk = null): self
     {
         $disk = $disk ?: $this->config->get('dompdf.disk');
-
-        if (! is_null($disk)) {
+        if (!is_null($disk)) {
             Storage::disk($disk)->put($filename, $this->output());
             return $this;
         }
-
         $this->files->put($filename, $this->output());
         return $this;
     }
-
     /**
      * Make the PDF downloadable by the user
      */
     public function download(string $filename = 'document.pdf'): Response
     {
         $output = $this->output();
-        $fallback = $this->fallbackName($filename);
-
-        return new Response($output, 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => HeaderUtils::makeDisposition('attachment', $filename, $fallback),
-            'Content-Length' => strlen($output),
-        ]);
+        $fallback = $this->fallback_name($filename);
+        return new Response($output, 200, ['Content-Type' => 'application/pdf', 'Content-Disposition' => Header_Utils::make_disposition('attachment', $filename, $fallback), 'Content-Length' => strlen($output)]);
     }
-
     /**
      * Return a response with the PDF to show in the browser
      */
     public function stream(string $filename = 'document.pdf'): Response
     {
         $output = $this->output();
-        $fallback = $this->fallbackName($filename);
-
-        return new Response($output, 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => HeaderUtils::makeDisposition('inline', $filename, $fallback),
-        ]);
+        $fallback = $this->fallback_name($filename);
+        return new Response($output, 200, ['Content-Type' => 'application/pdf', 'Content-Disposition' => Header_Utils::make_disposition('inline', $filename, $fallback)]);
     }
-
     /**
      * Render the PDF
      */
     public function render(): void
     {
         $this->dompdf->render();
-
-        if ($this->showWarnings) {
+        if ($this->show_warnings) {
             global $_dompdf_warnings;
             if (!empty($_dompdf_warnings) && count($_dompdf_warnings)) {
                 $warnings = '';
@@ -245,35 +212,27 @@ class PDF
         }
         $this->rendered = true;
     }
-
     /** @param array<string> $pc */
-    public function setEncryption(string $password, string $ownerpassword = '', array $pc = []): void
+    public function set_encryption(string $password, string $ownerpassword = '', array $pc = []): void
     {
         $this->render();
-        $canvas = $this->dompdf->getCanvas();
-        if (! $canvas instanceof CPDF) {
+        $canvas = $this->dompdf->get_canvas();
+        if (!$canvas instanceof CPDF) {
             throw new \RuntimeException('Encryption is only supported when using CPDF');
         }
-        $canvas->get_cpdf()->setEncryption($password, $ownerpassword, $pc);
+        $canvas->get_cpdf()->set_encryption($password, $ownerpassword, $pc);
     }
-
-    protected function convertEntities(string $subject): string
+    protected function convert_entities(string $subject): string
     {
         if (false === $this->config->get('dompdf.convert_entities', true)) {
             return $subject;
         }
-
-        $entities = [
-            '€' => '&euro;',
-            '£' => '&pound;',
-        ];
-
+        $entities = ['€' => '&euro;', '£' => '&pound;'];
         foreach ($entities as $search => $replace) {
             $subject = str_replace($search, $replace, $subject);
         }
         return $subject;
     }
-
     /**
      * Dynamically handle calls into the dompdf instance.
      *
@@ -283,22 +242,18 @@ class PDF
     public function __call(string $method, array $parameters)
     {
         if (method_exists($this, $method)) {
-            return $this->$method(...$parameters);
+            return $this->{$method}(...$parameters);
         }
-
         if (method_exists($this->dompdf, $method)) {
-            $return = $this->dompdf->$method(...$parameters);
-
+            $return = $this->dompdf->{$method}(...$parameters);
             return $return == $this->dompdf ? $this : $return;
         }
-
         throw new \UnexpectedValueException("Method [{$method}] does not exist on PDF instance.");
     }
-
     /**
      * Make a safe fallback filename
      */
-    protected function fallbackName(string $filename): string
+    protected function fallback_name(string $filename): string
     {
         return str_replace('%', '', Str::ascii($filename));
     }
